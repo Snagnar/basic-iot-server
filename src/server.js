@@ -10,13 +10,10 @@ const fs = require("fs");
 const spawn = require("child_process").spawn;
 
 //Imports
-const config = require("config")(path.join(__dirname, ".."));
-const logger = require("logger");
+const config = require("./config")(path.join(__dirname, ".."));
+const logger = require("./logger");
 
-app.use(bodyParser());
-app.use((req, res, next) => {
-    res.status(404).send("That route does not exist!");
-});
+// // app.use(bodyParser());6
 
 
 module.exports = {
@@ -37,7 +34,8 @@ module.exports = {
                 files.map(file => {
 
                     // load the config.default.json from subdirectory (required)
-                    const routeConfig = require("config")(path.join(dir, file));
+                    logger.info(`getting conifig of ${path.join(dir,file)} whilst ${dir} ${file}`);
+                    const routeConfig = require("./config")(path.join(dir, file));
                     if(!routeConfig.method || !routeConfig.args) {
                         logger.error(`invalid config at route ${file}`);
                         return;
@@ -48,12 +46,13 @@ module.exports = {
 
                         // register get route
                         case "get":
-
+                            logger.info(`registering get for route /api/${file}`)
                             app.get("/api/"+file, async (req, res) => {
+                                logger.success(`got request on route /api/${file}`);
 
                                 // check request validity by checking if every arg from config is present in query string
                                 const validRequest = routeConfig.args.reduce((prev, arg) => {
-                                    if(!req.qs['arg']) {
+                                    if(! (arg in req.query)) {
                                         logger.error(`Invalid request on endpoint ${file}: Argument ${arg} is missing!`);
                                         prev = false;
                                     }
@@ -121,8 +120,11 @@ module.exports = {
         });
     },
     begin() {
+        app.use((req, res, next) => {
+            res.status(404).send("That route does not exist!");
+        });
         app.listen(config.port, () => {
-            logger.success(`Server is now listening on port ${config.port}`);
+            logger.success(`Server is now listening on port ${config.port} with routes ${JSON.stringify(app._router.stack)}`);
         });
     }
 }
