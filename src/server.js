@@ -7,13 +7,17 @@ const express = require("express");
 const app = express();
 const path = require("path");
 const fs = require("fs");
-const execFile = require("child_process").execFile;
+const spawn = require("child_process").spawn;
 
 //Imports
 const config = require("config")(path.join(__dirname, ".."));
 const logger = require("logger");
 
 app.use(bodyParser());
+app.use((req, res, next) => {
+    res.status(404).send("That route does not exist!");
+});
+
 
 module.exports = {
     loadAndRegisterRoutes(dir) {
@@ -114,6 +118,11 @@ module.exports = {
                 await Promise.all(executions);
                 resolve();
             });
+        });
+    },
+    begin() {
+        app.listen(config.port, () => {
+            logger.success(`Server is now listening on port ${config.port}`);
         });
     }
 }

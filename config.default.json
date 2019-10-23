@@ -1,0 +1,4 @@
+{
+    "port": 6500,
+    "routes_directory": "routes"
+}

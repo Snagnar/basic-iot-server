@@ -5,3 +5,13 @@
  * @version 2019.10.23
  */
 
+// Imports
+
+// Modules
+const logger = require("src/logger");
+const config = require("src/config")(__dirname);
+const server = require("src/server");
+
+await server.loadAndRegisterRoutes(config.routes_directory);
+await server.begin();
+logger.success("Now started everything!");
