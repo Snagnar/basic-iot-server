@@ -56,7 +56,8 @@ module.exports = {
     },
     executeScripts(dir) {
         if(!dir || !fs.existsSync(path.join(dir, "scripts"))) {
-            logger.warn(`No scripts-directory found at route ${path.parse(dir).base}`)
+            logger.warn(`No scripts-directory found at route ${path.parse(dir).base}`);
+            return;
         }
     }
 }

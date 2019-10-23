@@ -5,6 +5,3 @@
  * @version 2019.10.23
  */
 
- // Modules
- const express = require("express")
- const app = express();
