@@ -56,6 +56,7 @@ module.exports = {
                                         logger.error(`Invalid request on endpoint ${file}: Argument ${arg} is missing!`);
                                         prev = false;
                                     }
+                                    return prev;
                                 }, true);
 
                                 //abort if request was invalid
@@ -66,7 +67,7 @@ module.exports = {
                                 }
 
                                 // else execute all .sh scripts in scripts directory in routes subfolder
-                                await this.executeScripts(path.join(dir,file));
+                                await this.executeScripts(path.join(dir,file), req.query);
                                 res.status(200);
                                 res.send("Request has been executed.");
                             });
@@ -91,9 +92,11 @@ module.exports = {
                 logger.warn(`No scripts-directory found at route ${path.parse(dir).base}`);
                 return reject();
             }
-            const argList = data.keys.reduce((prev, key) => {
-                prev.push(`--${key} ${data.key}`);
+            const argList = Object.keys(data).reduce((prev, key) => {
+                prev.push(`--${key} ${data[key]}`);
+                return prev;
             },[]);
+
             fs.readdir(path.join(dir, "scripts"), async (err, files) => {
                 if(err) {
                     logger.error(`Error reading directory ${JSON.stringify(path.join(dir, "scripts"))}`);
@@ -101,7 +104,8 @@ module.exports = {
                 }
                 const executions = files.reduce((prev, file) => {
                     prev.push(new Promise((resolve, reject) => {
-                        const ex=spawn("/bin/bash", argList.shift(path.join(dir, "scripts", file)));
+                        logger.info(`Executing script ${file}`);
+                        const ex=spawn("/bin/bash", [path.join(dir, "scripts", file), ...argList]);
                         ex.stdout.on('data', data => {
                             logger.info(`${file}: ${data}`);
                         });
@@ -113,18 +117,19 @@ module.exports = {
                             resolve();
                         });
                     }));
+                    return prev;
                 }, []);
                 await Promise.all(executions);
                 resolve();
             });
         });
     },
-    begin() {
+    async begin() {
         app.use((req, res, next) => {
             res.status(404).send("That route does not exist!");
         });
         app.listen(config.port, () => {
-            logger.success(`Server is now listening on port ${config.port} with routes ${JSON.stringify(app._router.stack)}`);
+            logger.success(`Server is now listening on port ${config.port}!`);
         });
     }
 }

@@ -9,14 +9,8 @@
 const path = require("path");
 
 // Modules
-const logger = require("./src/logger");
-const config = require("./src/config")(__dirname);
 const server = require("./src/server");
-
+const config = require("./src/config")(__dirname);
 
 server.loadAndRegisterRoutes(path.join(__dirname, config.routes_directory));
-// .then(() => {
-// server.begin();
-// });
-setTimeout(server.begin, 1000);
-logger.success("Now started everything!");
+setTimeout(server.begin, 500);
