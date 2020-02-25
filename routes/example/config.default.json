@@ -1,4 +1,8 @@
 {
 	"method": "get",
-	"args": []
+	"args": [],
+	"response": {
+		"type": "script",
+		"script": "routes/example/response.sh"
+	}
 }

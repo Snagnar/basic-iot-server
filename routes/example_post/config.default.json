@@ -1,0 +1,8 @@
+{
+	"method": "post",
+	"args": ["post-data-path"],
+	"response": {
+		"type": "static",
+		"content": "done."
+	}
+}

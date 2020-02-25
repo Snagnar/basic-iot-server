@@ -59,3 +59,8 @@ typings/
 
 # next.js build output
 .next
+
+# route ignore (you don't actuall want the whole world to see your routes, do ya?)
+routes/*
+!routes/example
+!routes/example_post
